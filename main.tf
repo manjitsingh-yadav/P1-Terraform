@@ -1,25 +1,3 @@
-variable "aws_key_pair" {
-  default = "~/aws/aws_keys/default-EC2-3.pem"
-}
-
-variable "aws_key_name"{
-  default = "default-EC2-3"
-}
-
-variable "ec2_instance_type"{
-  default = "t2.micro"
-}
-
-variable "ingress_rules" {
-  type = list(number)
-  default = [80,22]
-}
-
-variable "ami_image_owner" {
-  type = list(string)
-  default = ["099720109477"]
-}
-
 terraform {
   required_providers {
     aws = {
@@ -39,25 +17,6 @@ resource "aws_default_vpc" "default" {
 
 }
 
-data "aws_subnet_ids" "default_subnets" {
-  vpc_id = aws_default_vpc.default.id
-}
-
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = var.ami_image_owner
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 # Create a security group
 # 1. Jenkins Server -> 80 TCP, 22 TCP, CIDR ["0.0.0.0/0"]
 resource "aws_security_group" "Jenkins_server_sg" {
@@ -74,7 +33,7 @@ resource "aws_security_group" "Jenkins_server_sg" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
